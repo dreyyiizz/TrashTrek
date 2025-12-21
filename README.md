@@ -40,6 +40,36 @@ In **TrashTrek**, your goal is to run as far as possible while managing your ene
 - **Language**: GDScript
 - **Architecture**: State-machine based player controller, global game manager, and modular UI system.
 
+## ⚙️ Local Setup
+
+To run this project locally, follow these steps:
+
+### Prerequisites
+
+- Download and install **[Godot Engine 4.4](https://godotengine.org/download)** (Forward Plus renderer recommended).
+
+### Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/dreyyiizz/GameOn.git
+   ```
+2. **Set up Environment Variables**:
+   Create a `.env` file in the root directory and add your server.
+
+   Note: The server is found in another repository. [Click here to access it.](https://github.com/wends05/trashtrek-server.git)
+   
+   URL:
+
+   ```env
+   SERVER_URL="your_api_server_url_here"
+   ```
+
+3. **Open Godot Engine**.
+4. Click on **Import** and navigate to the cloned folder.
+5. Select the `project.godot` file and click **Open**.
+6. Once the project loads, press `F5` or the **Play** button in the top right corner to start the game.
+
 ## 👥 Credits
 
 ### Lead Developer
