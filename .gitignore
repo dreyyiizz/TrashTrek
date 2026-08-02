@@ -9,3 +9,6 @@
 
 .env
 .env.example
+
+# Local/demo build artifacts
+builds/

@@ -57,8 +57,10 @@ func _update_last_modified() -> void:
 	lastModified = Time.get_datetime_string_from_datetime_dict(Time.get_datetime_dict_from_system(true), false)
 	_save()
 
-func _save():
-	ResourceSaver.save(self, PLAYER_STATS_SAVE_PATH)
+func _save() -> void:
+	var save_error := ResourceSaver.save(self, PLAYER_STATS_SAVE_PATH)
+	if save_error != OK:
+		push_error("Failed to save player stats: %s" % save_error)
 
 func compare_to_resource(player_stats: Dictionary) -> void:
 	var db_last_modified = Time.get_unix_time_from_datetime_string(player_stats.get("lastModified"))
@@ -83,7 +85,7 @@ func save_stats(player_stats: Dictionary) -> void:
 	_save()
 
 func save_name(new_name: String) -> void:
-	name = new_name
+	name = new_name.strip_edges()
 	_update_last_modified()
 
 func update_name(new_name: String):
@@ -172,18 +174,19 @@ func get_equipped_skin() -> String:
 #endregion
 
 #region creating user
-func create_user(new_name: String):
-	var player_resource = PlayerStatsResource.new()
+func create_user(new_name: String) -> void:
+	name = new_name.strip_edges()
+	device_id = get_device_id()
+	lastModified = Time.get_datetime_string_from_datetime_dict(Time.get_datetime_dict_from_system(true), false)
+	_save()
 
-	print_debug("Initial player resource: %s" % player_resource.to_dict())
-	player_resource.name = new_name
-	player_resource.device_id = get_device_id()
-	player_resource.lastModified = Time.get_datetime_string_from_datetime_dict(Time.get_datetime_dict_from_system(true), false)
+	if not PlayerApi.is_configured():
+		return
 
-	print_debug("Final player resource: %s" % player_resource.to_dict())
+	print_debug("Creating player resource: %s" % to_dict())
 	if not PlayerApi.create_user_success.is_connected(_on_create_user_success):
 		PlayerApi.create_user_success.connect(_on_create_user_success)
-	PlayerApi.create_user(player_resource.to_dict())
+	PlayerApi.create_user(to_dict())
 
 func _on_create_user_success(result: Dictionary) -> void:
 	print_debug("Create user success: %s" % result)
@@ -195,6 +198,10 @@ func _on_create_user_success(result: Dictionary) -> void:
 func save_to_database() -> void:
 	var final_dict = self.to_dict().duplicate()
 	print_debug("Saving to database: %s" % final_dict)
+	_save()
+
+	if not PlayerApi.is_configured():
+		return
 
 	final_dict.erase("lastModified")
 	final_dict.erase("device_id")
@@ -205,21 +212,36 @@ func save_to_database() -> void:
 
 func _on_update_user_success(result: Dictionary) -> void:
 	print_debug("Update user success: %s" % result)
-	var new_last_modified = result.get("lastModified")
-	if new_last_modified > lastModified:
+	var new_last_modified := str(result.get("lastModified", ""))
+	if not new_last_modified.is_empty() and (lastModified.is_empty() or new_last_modified > lastModified):
 		lastModified = new_last_modified
 		_save()
 
 #endregion
 
 #region Delete Account
-func delete_account():
+func delete_account() -> void:
+	if not PlayerApi.is_configured():
+		_reset_local_profile()
+		PlayerApi.delete_user_success.emit(true)
+		return
+
 	if not PlayerApi.delete_user_success.is_connected(_on_delete_user_success):
 		PlayerApi.delete_user_success.connect(_on_delete_user_success)
 	PlayerApi.delete_user()
 
 func _on_delete_user_success(_is_success: bool) -> void:
-	var player_stats = PlayerStatsResource.new()
-	ResourceSaver.save(player_stats, PLAYER_STATS_SAVE_PATH)
-	save_stats(player_stats.to_dict())
+	_reset_local_profile()
+
+
+func _reset_local_profile() -> void:
+	device_id = get_device_id()
+	name = ""
+	coins = 0
+	high_score = 0.0
+	upgrades = {}
+	skins = ["Default"]
+	current_skin = "Default"
+	lastModified = ""
+	_save()
 #endregion

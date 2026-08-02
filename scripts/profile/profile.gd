@@ -63,7 +63,19 @@ func _restart_game():
 
 func _on_edit_button_pressed() -> void:
 	if editing:
-		player_stats_resource.update_name(name_edit.text)
+		var new_name: String = name_edit.text.strip_edges()
+		if new_name.is_empty():
+			dialog.dialog_text = "Error: Name must be at least 1 character long"
+			dialog.visible = true
+			return
+
+		player_stats_resource.update_name(new_name)
+		if not PlayerApi.is_configured():
+			dialog.dialog_text = "Name changed to: %s" % player_stats_resource.name
+			_finish_local_name_update()
+			dialog.visible = true
+			return
+
 		edit_button.text = "Loading"
 		return
 	
@@ -78,11 +90,16 @@ func toggle_edit_name():
 
 func _on_update_user_success(result: Dictionary) -> void:
 	print_debug("Update user success: %s" % result)
-	dialog.dialog_text = "Name changed to: %s" % result.name
+	dialog.dialog_text = "Name changed to: %s" % result.get("name", player_stats_resource.name)
+	_finish_local_name_update()
+	dialog.visible = true
+
+
+func _finish_local_name_update() -> void:
 	reset_name_display()
 	reset_name_edit_placeholder_text()
-	toggle_edit_name()
-	dialog.visible = true
+	if editing:
+		toggle_edit_name()
 
 func _on_update_user_failed(err: Dictionary) -> void:
 	var message = ApiService.parse_error_message(err)
