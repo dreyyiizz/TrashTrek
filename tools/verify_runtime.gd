@@ -2,6 +2,8 @@ extends Node
 
 const LEGACY_RIVER_TERRAIN := "res://scenes/terrains/RiverTerrain.tscn"
 const LEGACY_RESOURCES := ["res://tile_map.tres"]
+const AUTHORING_VIEWPORT := Vector2i(1152, 648)
+const DEMO_WINDOW := Vector2i(1280, 720)
 
 const REQUIRED_SCENES := [
 	"res://scenes/intro/input_name.tscn",
@@ -37,6 +39,8 @@ var verification_exit_code := 0
 
 
 func _ready() -> void:
+	_verify_display_configuration()
+
 	for path in REQUIRED_SCENES:
 		_load_resource_once(path, true)
 
@@ -67,6 +71,21 @@ func _ready() -> void:
 		verification_exit_code = 1
 
 	call_deferred("_finish")
+
+
+func _verify_display_configuration() -> void:
+	var viewport := Vector2i(
+		int(ProjectSettings.get_setting("display/window/size/viewport_width", -1)),
+		int(ProjectSettings.get_setting("display/window/size/viewport_height", -1))
+	)
+	var window_override := Vector2i(
+		int(ProjectSettings.get_setting("display/window/size/window_width_override", -1)),
+		int(ProjectSettings.get_setting("display/window/size/window_height_override", -1))
+	)
+	if viewport != AUTHORING_VIEWPORT:
+		failures.append("Viewport is %s; authored game canvas is %s" % [viewport, AUTHORING_VIEWPORT])
+	if window_override != DEMO_WINDOW:
+		failures.append("Window override is %s; demo window is %s" % [window_override, DEMO_WINDOW])
 
 
 func _verify_offline_api_contract() -> void:

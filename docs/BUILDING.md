@@ -6,6 +6,11 @@ The game is offline-first: gameplay, profile data, and shop data are stored in
 the Godot `user://` directory. Leaderboards show an offline status when no
 server is configured.
 
+The scenes are authored on a 1152×648 canvas and displayed in the 1280×720
+demo window through canvas-item stretching. Keep both values when checking
+layout; changing the authoring viewport leaves an unfilled strip around the
+artwork.
+
 ## Prerequisites
 
 - Godot 4.7.1 with the Windows Desktop and macOS export templates installed.
