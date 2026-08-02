@@ -9,4 +9,5 @@ var player_stats_resource: PlayerStatsResource = PlayerStatsResource.get_instanc
 @export var texture_tilemap: Texture
 
 static func find_instance(skin_name: String) -> SkinResource:
-  return ResourceLoader.load("res://resources/shop/skins/%s.tres" % skin_name)
+	var file_name := skin_name.strip_edges().to_lower().replace(" ", "_")
+	return ResourceLoader.load("res://resources/shop/skins/%s.tres" % file_name)

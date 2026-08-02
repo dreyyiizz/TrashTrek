@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://bgrvgfs20vcpo"]
 
 [ext_resource type="Theme" uid="uid://ce38n1txntje6" path="res://resources/font_theme.tres" id="1_qqefk"]
-[ext_resource type="Script" uid="uid://cvyopmh3wqni" path="res://scripts/leaderboards/leaderboards.gd" id="2_jhwl6"]
+[ext_resource type="Script" uid="uid://b3y0xgkgnym46" path="res://scripts/leaderboards/leaderboards.gd" id="2_jhwl6"]
 [ext_resource type="Texture2D" uid="uid://cgvmva3mgd0m6" path="res://assets/menu/leaderboards/leaderboard.png" id="2_qqefk"]
 
 [node name="Leaderboards" type="Control"]
@@ -47,6 +47,15 @@ grow_vertical = 2
 texture = ExtResource("2_qqefk")
 expand_mode = 1
 stretch_mode = 6
+
+[node name="Status" type="Label" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 392.0
+offset_top = 144.0
+offset_right = 776.0
+offset_bottom = 176.0
+horizontal_alignment = 1
 
 [node name="Display" type="VBoxContainer" parent="."]
 layout_mode = 1
